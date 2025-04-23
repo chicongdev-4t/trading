@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Service\AccountService;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,6 +13,13 @@ use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
+    protected AccountService $accountService;
+
+
+    public function __construct(AccountService $accountService) {
+        $this->accountService = $accountService;
+    }
+
     /**
      * Display the login view.
      */
@@ -29,6 +37,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        $user = auth()->user();
+        $this->accountService->generateAccounts($user);
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 

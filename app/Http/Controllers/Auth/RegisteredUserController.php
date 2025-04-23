@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Service\AccountService;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
@@ -15,6 +16,13 @@ use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
+    protected AccountService $accountService;
+
+
+    public function __construct(AccountService $accountService) {
+        $this->accountService = $accountService;
+    }
+
     /**
      * Display the registration view.
      */
@@ -41,6 +49,8 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        $this->accountService->generateAccounts($user);
 
         event(new Registered($user));
 
